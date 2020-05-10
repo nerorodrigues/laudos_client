@@ -1,0 +1,18 @@
+.ui.placeholder.segment > .ui.form > .field:not(.upload),
+.ui.placeholder.segment > .ui.form > .field > .button,
+.ui.placeholder.segment > .ui.form > .fields > .field,
+.ui.placeholder.segment > .ui.form > .field > textarea{
+    max-width: none;
+}
+
+.ui.form input[type=file]{
+    background-color: transparent;
+    border-color: transparent;
+    vertical-align: middle;
+}
+
+.ui.form > .field > label,
+.ui.form > .field > .ui.checkbox{
+    text-align: left;
+    display: block;
+}
