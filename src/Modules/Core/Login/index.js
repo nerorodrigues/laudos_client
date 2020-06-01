@@ -1,14 +1,7 @@
 import React from "react";
-import { Grid, Segment, Form, Button, Message, Transition, Container } from "semantic-ui-react";
-import SignInContainer from "../../../Graphql/containers/signin";
+import { Grid, Segment, Form, Button, Message, Transition } from "semantic-ui-react";
 import { Redirect } from "react-router-dom";
-
-const requestOptions = {
-    method: 'post',
-    headers: {
-        'Contenty-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-    },
-}
+import CheckAuth from "../../../Lib/Authentication";
 
 class Login extends React.Component {
 
@@ -17,8 +10,7 @@ class Login extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.state = {
-            error: true,
-            animation: 'fade up',
+            error: false,
             duration: 800,
             userName: '',
             password: '',
@@ -29,8 +21,7 @@ class Login extends React.Component {
 
     handleSubmit(e) {
         e.preventDefault();
-        //fetch('http://localhost:3000/login',
-        fetch('https://laudos.herokuapp.com/login',
+        fetch(false ? 'https://laudos.herokuapp.com/login' : 'http://localhost:3000/login',
             {
                 method: 'post',
                 credentials: 'include',
@@ -39,20 +30,25 @@ class Login extends React.Component {
                 },
                 body: `userName=${this.state.userName}&password=${this.state.password}`
             }).then(response => {
-                return response.json()
+                if (response.status === 200)
+                    return response.json()
+                else
+                    throw new Error(response.Message)
+            }, err => {
+                this.setState({
+                    error: true
+                });
+                return err;
             })
             .then(data => {
-                document.cookie = 'signedin=true';
                 this.setState({ isLogged: true });
+                localStorage.setItem('AuthToken', data.token)
                 this.props.componentCallback(true);
+            }).catch(err => {
+                this.setState({
+                    error: true
+                });
             });
-
-        // this.props.mutation({
-        //     variables: {
-        //         userName: this.state.userName,
-        //         password: this.state.password
-        //     }
-        // }).catch(result => { });
     }
 
     handleInputChange(evt) {
@@ -67,36 +63,23 @@ class Login extends React.Component {
     render() {
         var result;
         result =
-            !this.state.isLogged ? (
+            CheckAuth() || this.state.isLogged ? (<Redirect to='/' />) : (
                 <Grid textAlign="center" verticalAlign="middle" style={{ height: '100vh' }}>
                     <Grid.Column style={{ maxWidth: 450 }}>
-                        <Form error={this.state.error} size="large" onSubmit={this.handleSubmit}>
-                            <Segment stacked>
-                                <Form.Input fluid icon='user' iconPosition='left' placeholder='E-mail address' name='userName' value={this.state.userName} onChange={this.handleInputChange} />
-                                <Form.Input fluid icon='lock' iconPosition='left' placeholder='Password' type='password' name='password' value={this.state.password} onChange={this.handleInputChange} />
-                                <Button color='teal' fluid size='large'>Login</Button>
-                            </Segment>
-                        </Form>
-                        {/* <Message>
-                        New to us? <a href='#'>Sign Up</a>
-                    </Message> */}
-                        <Transition.Group animation={this.state.animation} duration={this.state.duration}>
-                            {
-                                this.props.error &&
-                                this.props.error.graphQLErrors.map(({ message }, i) => (<Message
-                                    error
-                                    header='Action Forbidden'
-                                    content={message}
-                                />))
-                            }
+                        <Transition.Group animation='fade up' duration={800}>
+                            <Form error={this.state.error} size="large" onSubmit={this.handleSubmit}>
+                                <Segment>
+                                    <Form.Input fluid icon='user' iconPosition='left' placeholder='E-mail address' name='userName' value={this.state.userName} onChange={this.handleInputChange} />
+                                    <Form.Input fluid icon='lock' iconPosition='left' required placeholder='Password' type='password' name='password' value={this.state.password} onChange={this.handleInputChange} />
+                                    <Button color='teal' fluid size='large'>Login</Button>
+                                    < Message error header='Error ao realizar login' content={this.state.error} />
+                                </Segment>
+                            </Form>
                         </Transition.Group>
-                    </Grid.Column>
-                </Grid>) : (<Redirect to='/' />)
+                    </Grid.Column >
+                </Grid >
+            )
         return result;
     }
 }
 export default Login;
-
-// export default () => (<SignInContainer>{
-//     (mutation, { ...props }) => <Login mutation={mutation} {...props} />
-// }</SignInContainer>);

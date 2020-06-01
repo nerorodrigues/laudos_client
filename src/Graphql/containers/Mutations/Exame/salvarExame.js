@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import { Mutation, useMutation } from "react-apollo";
+import { useMutation } from "react-apollo";
 
 var EXAME_SCHEMA = gql(`
     mutation salvarExame($exame: ExameInput!){

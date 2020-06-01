@@ -1,0 +1,4 @@
+{
+    "appUrl": "http://localhost:3000/graphql",
+    "appUrl1": "https://laudos.herokuapp.com/graphql"
+}

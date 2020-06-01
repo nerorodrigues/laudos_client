@@ -1,12 +1,7 @@
 import React from "react";
-import { Form, Container } from "semantic-ui-react";
+import { Container } from "semantic-ui-react";
 import SalvarExameContainer from "../../Graphql/containers/Exame/salvarExame";
 import './upload.css';
-
-
-import gql from "graphql-tag";
-import { useMutation } from "react-apollo";
-
 
 class Upload extends React.Component {
     constructor(props) {
@@ -50,12 +45,6 @@ class Upload extends React.Component {
 
     submitHandle(e) {
         e.preventDefault();
-        // this.props.mutation({
-        //     variables: {
-        //         image: this.state.exameFile
-        //     }
-        // }).catch(result => { });
-
         this.props.mutation({
             variables: {
                 exame:
@@ -86,9 +75,13 @@ class Upload extends React.Component {
                         <Form.Input type='submit' />
                     </Form> */}
                 {/*                     <div className="ui grid" > */}
-                <div className="ui center aligned middle aligned grid" style={{ height: "90vh" }}>
-                    <div className="column" style={{ maxWidth: "60%", minWidth: 700 }}>
-                        <div className="ui placeholder segment aligned">
+                {/* style={{ height: "90vh" }} */}
+                
+                
+                {/* <div className="ui center aligned middle aligned grid" > */}
+                    {/* style={{ maxWidth: "60%", minWidth: 700 }} */}
+                    {/* <div className="column"> */}
+                        {/* <div className="ui placeholder segment aligned"> */}
                             <form className='ui form' onSubmit={this.submitHandle}
                             // onSubmit={e => {
                             //     e.preventDefault();
@@ -147,9 +140,7 @@ class Upload extends React.Component {
                                     <input type='submit' className='ui fluid green button' value='Cadastrar' />
                                 </div>
                             </form>
-                        </div>
-                    </div>
-                </div>
+                        {/* </div> */}
             </Container>
         );
     }
@@ -157,6 +148,4 @@ class Upload extends React.Component {
 
 
 
-export default () => (<SalvarExameContainer>{
-    (mutation, { ...props }) => <Upload mutation={mutation} {...props} />
-}</SalvarExameContainer>);
+export default (handler) => (<SalvarExameContainer>{(mutation, { ...props }) => <Upload handler={handler} mutation={mutation} {...props} />}</SalvarExameContainer>);

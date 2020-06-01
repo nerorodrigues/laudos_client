@@ -1,73 +1,66 @@
 import React from "react";
 import { Component } from "react";
-import Registries from "./Modules/Registries"
+import Exames from "./Modules/Exames"
+import ExamesPorCliente from "./Modules/ExamesPorCliente"
 import Login from "./Modules/Core/Login";
 import Logoff from "./Modules/Core/Logoff";
-import Upload from "./Modules/Upload";
 import Home from "./Modules/Core/Home";
-import Cookies from "js-cookie";
+import TesteVisual from "./testeVisual";
+import PrivateRoute from "./Components/PrivateRoute";
+import PasswordChange from "./Modules/Core/PasswordChange";
 
-import { BrowserRouter as Router, Route, Redirect, Switch, Link } from 'react-router-dom'
-import { Menu } from "semantic-ui-react";
+import './app.css';
 
-
-const checkAuth = () => {
-    return Cookies.get('signedin') == 'true'
-}
-
-const PrivateRoute = ({ component: Component, componentCallback, ...rest }) => (
-    <Route {...rest}
-        render={props =>
-            checkAuth() ? (
-                <Component {...props} componentCallback={componentCallback} />
-            ) : (
-                    <Redirect
-                        to={{
-                            pathname: "/login",
-                            state: { from: props.location }
-                        }}
-                    />
-                )
-        }
-    />
-);
+import { BrowserRouter as Router, Route, Switch, NavLink } from 'react-router-dom'
+import GraphQL from "./Lib/GraphQL";
+import checkAuth from "./Lib/Authentication";
 
 class App extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { isLoggedIn: checkAuth() };
+        this.state = { isAuthenticated: false };
         this.componentCallback = this.componentCallback.bind(this);
     }
 
     componentCallback(value) {
-        this.setState({ isLoggedIn: value });
+        this.setState({
+            isAuthenticated: checkAuth()
+        });
+    }
+
+    componentDidMount() {
+        this.setState({ isAuthenticated: checkAuth });
     }
 
     render() {
         return (
             <div>
+
                 <Router>
-                    {this.state.isLoggedIn && (<Menu>
-                        <Menu.Item>
-                            <Link to="/logoff">Logoff</Link>
-                        </Menu.Item>
-                        <Menu.Item>
-                            <Link to="/upload">Upload</Link>
-                        </Menu.Item>
-                    </Menu>)}
-                    <Switch>
-                        <Route path='/login'>
-                            <Login componentCallback={this.componentCallback} />
-                        </Route>
-                        <PrivateRoute path='/logoff' component={Logoff} componentCallback={this.componentCallback} />
-                        <PrivateRoute path='/upload' component={Upload} />
-                        <PrivateRoute path="/" component={Registries} />
+                    {this.state.isAuthenticated && (
+                        <div className='ui pointing secondary menu'>
+                            <NavLink className='item' exact to="/">Home</NavLink>
+                            <NavLink className='item' exact to="/porcliente">Por Cliente</NavLink>
+                            <NavLink className='item' to="/teste">Testes</NavLink>
+                            <NavLink className='item' to="/passwordchange">Alterar senha</NavLink>
+                            <NavLink className='item' to="/logoff">Logoff</NavLink>
 
-                    </Switch>
+                        </div>)}
+                    <GraphQL>
+                        <Switch>
+                            <Route path='/login'>
+                                <Login componentCallback={this.componentCallback} />
+                            </Route>
+                            <PrivateRoute path='/logoff' component={Logoff} componentCallback={this.componentCallback} />
+                            <PrivateRoute path='/teste' component={TesteVisual} />
+                            <PrivateRoute path='/passwordchange' component={PasswordChange} />
+                            <PrivateRoute path="/porcliente" component={ExamesPorCliente} />
+                            <PrivateRoute path="/" component={Exames} />
+                        </Switch>
+                    </GraphQL>
                 </Router>
-                <Home/>
-
+                <Home />
             </div>)
     }
 }

@@ -1,14 +1,17 @@
 import React from "react";
 import gql from "graphql-tag";
-import { Query, useQuery } from 'react-apollo';
+import { Query } from 'react-apollo';
 
-var LISTAR_EXAMES = gql`
+const LISTAR_EXAMES = gql`
     query listarExames{
         listarExames{
             id,
             protocolo,
             dataExame,
-            nome
+            nome,
+            dataCadastro,
+            exameUrl,
+            laudoUrl
         }
     }
 `
